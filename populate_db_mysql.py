@@ -100,10 +100,6 @@ def show_values(connection):
 
 # Main function
 def main():
-    host = 'localhost'
-    user = 'root'
-    password = 'Rollno18'
-
     # Connect to MySQL
     connection = connect_mysql(host, user, password, 'test_db')
 

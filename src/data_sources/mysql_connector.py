@@ -121,6 +121,9 @@ class MySQLConnector:
 def main():
     connector = MySQLConnector()
     all_data = connector.extract_all_mysql_data()
+    # connection = connector.connect()
+    # dbs = connector.execute_query(connection, "SHOW DATABASES")
+    # print(dbs)
     
     # Example: Save the data to a JSON file
     with open('mysql_data.json', 'w') as f:

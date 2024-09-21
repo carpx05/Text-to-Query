@@ -66,7 +66,6 @@ class RAGAgent:
     def retriever(self, query: str) -> List[Document]:
         # Placeholder for the actual search_index function
         results = self.faiss_connector.search_faiss(query)
-        print(results)
         return [Document(page_content=json.dumps(r.get('sample_data', [])),  
                  metadata={
                      "score": r.get('score'), 
@@ -92,7 +91,7 @@ class RAGAgent:
         
         # Prepare context
         context = "\n\n".join([doc.page_content for doc in docs])
-
+        
         # Prepare the prompt
         full_prompt = self.prompt_template.format(context=context, question=query)
         
@@ -100,6 +99,7 @@ class RAGAgent:
         response = self.model.generate_content(full_prompt)
         
         answer = response.text
+
         sources = [doc.metadata for doc in docs]
 
         # Store the results in the SQLite persistence layer

@@ -21,7 +21,8 @@ def process_query():
 
     query = data['query']
     try:
-        result = orchestrator.process_query(query)
+        print(f"Processing query: {query}")
+        result = orchestrator.orchestrate_query(query)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

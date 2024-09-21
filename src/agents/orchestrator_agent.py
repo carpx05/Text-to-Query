@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional, Tuple
 import json
 import re
 
-from rag_agent import RAGAgent
+from src.agents.rag_agent import RAGAgent
 
 src_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(src_dir)
@@ -37,6 +37,7 @@ class OrchestratorAgent:
         try:
             sql_data = self.mysql_connector.extract_all_mysql_data()
             csv_data = self.csv_connector.extract_all_csv_data()
+            logger.info("Data extracted successfully")
             # Add other data sources as needed
             return sql_data + csv_data
         except Exception as e:
@@ -49,6 +50,7 @@ class OrchestratorAgent:
         """
         try:
             self.faiss_connector.store_in_faiss(data)
+            logger.info("Data stored in FAISS successfully")
         except Exception as e:
             logger.error(f"Error storing data in FAISS: {str(e)}")
             raise
@@ -59,6 +61,7 @@ class OrchestratorAgent:
         """
         try:
             return self.rag_agent.run_rag_pipeline(query)
+            logger.info("Query processed successfully")
         except Exception as e:
             logger.error(f"Error processing query: {str(e)}")
             raise
@@ -143,7 +146,7 @@ class OrchestratorAgent:
 # Example usage
 if __name__ == "__main__":
     orchestrator_agent = OrchestratorAgent()
-    query = "show me all sales transactions with product_id 1"
+    query = "show me transactions id for FZwdkpHZ"
     answer, sources = orchestrator_agent.orchestrate_query(query)
     print("Answer:", answer)
     # print("Type:", answer[type])
