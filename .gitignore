@@ -14,3 +14,15 @@ venv.bak/
 procure/
 
 text_to_sql_model/
+
+# Ignore text files
+*.txt
+
+# Ignore JSON files
+*.json
+
+# Ignore index files
+*.index
+
+# Ignore database files
+*.db
