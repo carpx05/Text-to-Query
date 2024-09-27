@@ -9,16 +9,13 @@ import sys
 import mysql.connector
 from mysql.connector import Error
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(project_dir)
 from config import Config
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -28,22 +25,19 @@ class CustomEncoder(json.JSONEncoder):
             return obj.isoformat()
         return super(CustomEncoder, self).default(obj)
 
-
 class MySQLConnector:
     def __init__(self):
-        self.host = Config.MYSQL_HOST
-        self.user = Config.MYSQL_USER
-        self.password = Config.MYSQL_PASSWORD
+        self.host=Config.MYSQL_HOST
+        self.user=Config.MYSQL_USER
+        self.password=Config.MYSQL_PASSWORD
 
-    def connect(
-        self, database: Optional[str] = None
-    ) -> Optional[mysql.connector.MySQLConnection]:
+    def connect(self, database: Optional[str] = None) -> Optional[mysql.connector.MySQLConnection]:
         try:
             connection = mysql.connector.connect(
                 host=self.host,
                 user=self.user,
                 password=self.password,
-                database=database,
+                database=database
             )
             return connection
         except Error as e:
@@ -51,9 +45,7 @@ class MySQLConnector:
             return None
 
     @staticmethod
-    def execute_query(
-        connection: mysql.connector.MySQLConnection, query: str
-    ) -> List[tuple]:
+    def execute_query(connection: mysql.connector.MySQLConnection, query: str) -> List[tuple]:
         try:
             with connection.cursor() as cursor:
                 cursor.execute(query)
@@ -71,11 +63,7 @@ class MySQLConnector:
         results = self.execute_query(connection, query)
         connection.close()
 
-        return [
-            db[0]
-            for db in results
-            if db[0] not in ["information_schema", "mysql", "performance_schema", "sys"]
-        ]
+        return [db[0] for db in results if db[0] not in ['information_schema', 'mysql', 'performance_schema', 'sys']]
 
     def get_tables(self, database: str) -> List[str]:
         connection = self.connect(database)
@@ -121,17 +109,14 @@ class MySQLConnector:
             for table in tables:
                 schema = self.get_schema(db, table)
                 sample_data = self.get_sample_data(db, table)
-                all_data.append(
-                    {
-                        "database": db,
-                        "table": table,
-                        "schema": schema,
-                        "sample_data": sample_data,
-                    }
-                )
+                all_data.append({
+                    "database": db,
+                    "table": table,
+                    "schema": schema,
+                    "sample_data": sample_data
+                })
 
         return all_data
-
 
 def main():
     connector = MySQLConnector()
@@ -139,13 +124,12 @@ def main():
     # connection = connector.connect()
     # dbs = connector.execute_query(connection, "SHOW DATABASES")
     # print(dbs)
-
+    
     # Example: Save the data to a JSON file
-    with open("mysql_data.json", "w") as f:
+    with open('mysql_data.json', 'w') as f:
         json.dump(all_data, f, cls=CustomEncoder, indent=2)
 
     logger.info("Data extraction completed successfully.")
-
 
 if __name__ == "__main__":
     main()

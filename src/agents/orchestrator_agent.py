@@ -6,24 +6,21 @@ import re
 
 from src.agents.rag_agent import RAGAgent
 
-src_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+src_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(src_dir)
 from data_sources.mysql_connector import MySQLConnector
 from data_sources.sqlite_connector import SQLiteConnector
 from data_sources.faiss_connector import FAISSConnector
 from data_sources.csv_connector import CSVConnector
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(project_dir)
 from config import Config
 
 import logging
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 class OrchestratorAgent:
     def __init__(self):
@@ -79,8 +76,9 @@ class OrchestratorAgent:
             self.store_data_in_faiss(data)
             answer, sources = self.process_query(query)
             logger.info("Query processed successfully")
-            self.post_process(answer)
-            return answer, sources
+            query, source_type = self.post_process(answer)
+
+            return query, source_type, sources
         except Exception as e:
             logger.error(f"Error orchestrating query: {str(e)}")
             raise
@@ -90,18 +88,21 @@ class OrchestratorAgent:
         Post-processing steps.
         """
         try:
-            json_str = answer.replace("`", "").replace("python", "", 1).strip()
-            print(json_str)
+            # json_str = answer.replace('`', '').replace('python', 'json', '', 1).strip()
+            json_str = re.sub(r'`|python|json|java', '', answer).strip()
             answer_json = json.loads(json_str)
 
-            if answer_json["type"] == "csv":
+            if answer_json['type'] == "csv":
                 # Post-process the CSV data
-                self._process_csv(answer_json["query"])
-            elif answer.json["type"] == "sql":
+                query = self._process_csv(answer_json['query'])
+            elif answer_json['type'] == "sql":
                 # Post-process the SQL data
-                self._process_sql(answer_json["query"])
-            else:
-                logger.info("No post-processing required.")
+                query = answer_json['query']
+                self._process_sql(query)
+            elif answer_json['type'] == None:
+                logger.info("No post-processing required.") 
+                query = None
+            return query, answer_json['type']           
         except Exception as e:
             logger.error(f"Error in post-processing: {str(e)}")
             raise
@@ -111,7 +112,7 @@ class OrchestratorAgent:
         Process the CSV query.
         """
         try:
-            with open("response.txt", "r") as file:
+            with open('response.txt', 'r') as file:
                 response_str = file.read()
 
             data_dir = Config.CSV_DATA_DIRECTORY
@@ -122,9 +123,7 @@ class OrchestratorAgent:
                 csv_filename = match.group(1)  # Extract the current CSV file name
                 csv_path = data_dir / csv_filename  # Construct the new path
                 csv_path_str = str(csv_path).replace("\\", "/")
-                updated_query = re.sub(
-                    pattern, lambda m: f"open(r'{csv_path_str}', 'r')", answer_query
-                )
+                updated_query = re.sub(pattern, lambda m: f"open(r'{csv_path_str}', 'r')", answer_query)
                 try:
                     exec(updated_query)
                 except Exception as e:
@@ -139,20 +138,19 @@ class OrchestratorAgent:
         Process the SQL query.
         """
         try:
-            data_dir = Config.CSV_DATA_DIRECTORY
             connection = self.mysql_connector.connect()
-            results = self.mysql_connector.execute_query(connection, query)
+            # results = self.mysql_connector.execute_query(connection, query)
             connection.close()
-            logger.info(f"Executed SQL query: {answer_query}")
-
+            logger.info(f"Executed SQL query: {query}")
+            
         except Exception as e:
             logger.error(f"Error processing SQL query: {str(e)}")
-
+            
 
 # Example usage
 if __name__ == "__main__":
     orchestrator_agent = OrchestratorAgent()
-    query = "show me transactions id for FZwdkpHZ"
+    query = "show me user id for FZwdkpHZ"
     answer, sources = orchestrator_agent.orchestrate_query(query)
     print("Answer:", answer)
     # print("Type:", answer[type])

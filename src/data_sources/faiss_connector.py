@@ -8,17 +8,14 @@ from sentence_transformers import SentenceTransformer
 from decimal import Decimal
 import datetime
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.append(project_dir)
 from config import Config
 
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -27,7 +24,6 @@ class CustomEncoder(json.JSONEncoder):
         elif isinstance(obj, (datetime.date, datetime.datetime)):
             return obj.isoformat()
         return super(CustomEncoder, self).default(obj)
-
 
 class FAISSConnector:
     def __init__(self):
@@ -138,18 +134,17 @@ class FAISSConnector:
             logger.error(f"Failed to perform FAISS search: {e}")
             raise
 
-
 # Usage example
 if __name__ == "__main__":
     faiss_manager = FAISSManager()
-
+    
     # Store data
     data_to_store = [{"id": 1, "text": "Example 1"}, {"id": 2, "text": "Example 2"}]
     faiss_manager.store_in_faiss(data_to_store)
-
+    
     # Search
     results = faiss_manager.search_faiss("Example", k=1)
     print(f"Search results: {results}")
-
+    
     # Delete index
     faiss_manager.delete_faiss_index()
