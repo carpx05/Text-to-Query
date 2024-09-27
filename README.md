@@ -11,7 +11,7 @@ A Text-to-SQL query system that uses a RAG chain implemented on a vector store t
 It is implemented on a RESTful with an endpoint ‘/query’ that accepts a natural language query and returns the result from either the MySQL database or CSV.
 
 ### Technical Implementation
-![Architecture](assets\concept_map.png)
+![Architecture](assets/concept_map.png)
 
 #### Architecture Overview
 1. Backend: Python with RESTful API
@@ -77,6 +77,20 @@ To run the WSGI application:
 
 Ensure you're in the project directory and your virtual environment is activated (if you're using one).
 Run the following command:
+```
+git clone https://github.com/carpx05/Text-to-Query.git
+cd Text-to-Query
+```
+Create a virtual environment
+```
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+```
+Install requirements
+```
+pip install -r requirements.txt
+```
+Start the server
 ```
 python wsgi.py
 ```
