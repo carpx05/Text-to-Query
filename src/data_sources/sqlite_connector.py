@@ -2,6 +2,7 @@ import sqlite3
 import json
 from config import Config
 
+
 class SQLiteConnector:
     def __init__(self):
         self.conn = None
@@ -13,20 +14,26 @@ class SQLiteConnector:
         self._create_table()
 
     def _create_table(self):
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS rag_results
-                               (id INTEGER PRIMARY KEY, query TEXT, answer TEXT, sources TEXT)''')
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS rag_results
+                               (id INTEGER PRIMARY KEY, query TEXT, answer TEXT, sources TEXT)"""
+        )
         self.conn.commit()
 
     def get_result(self, query):
-        self.cursor.execute("SELECT answer, sources FROM rag_results WHERE query = ?", (query,))
+        self.cursor.execute(
+            "SELECT answer, sources FROM rag_results WHERE query = ?", (query,)
+        )
         result = self.cursor.fetchone()
         if result:
             return result[0], json.loads(result[1])
         return None, None
 
     def store_result(self, query, answer, sources):
-        self.cursor.execute("INSERT INTO rag_results (query, answer, sources) VALUES (?, ?, ?)",
-                            (query, answer, json.dumps(sources)))
+        self.cursor.execute(
+            "INSERT INTO rag_results (query, answer, sources) VALUES (?, ?, ?)",
+            (query, answer, json.dumps(sources)),
+        )
         self.conn.commit()
 
     def close(self):

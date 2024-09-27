@@ -4,20 +4,19 @@ import random
 import string
 from datetime import datetime, timedelta
 
+
 # Function to create a connection to MySQL
 def connect_mysql(host, user, password, database=None):
     try:
         connection = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database
+            host=host, user=user, password=password, database=database
         )
         if connection.is_connected():
             return connection
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+
 
 # Function to create the database and table
 def create_database_and_table(connection):
@@ -61,10 +60,11 @@ def create_database_and_table(connection):
     (11, 'purchase', '{"item": "Keyboard", "price": 70}', TRUE),
     (12, 'comment', '{"post_id": 50, "comment_text": "Good insights."}', TRUE);
     """
-    
+
     cursor.execute(create_table_query)
     cursor.execute(insert_table_query)
     connection.commit()
+
 
 # Function to generate random values and insert into the table
 def insert_random_values(connection, num_entries=12):
@@ -73,7 +73,7 @@ def insert_random_values(connection, num_entries=12):
     # Generating random values
     for _ in range(num_entries):
         transaction_id = random.randint(1000, 9999)
-        username = ''.join(random.choices(string.ascii_letters, k=8))
+        username = "".join(random.choices(string.ascii_letters, k=8))
         amount = round(random.uniform(10.00, 500.00), 2)
         random_days = random.randint(1, 365)
         date = (datetime.now() - timedelta(days=random_days)).date()
@@ -86,10 +86,11 @@ def insert_random_values(connection, num_entries=12):
 
     connection.commit()
 
+
 def show_values(connection):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM user_activity")
-    
+
     # Fetch all the records
     records = cursor.fetchall()
 
@@ -98,15 +99,16 @@ def show_values(connection):
     for record in records:
         print(record)
 
+
 # Main function
 def main():
     # Connect to MySQL
-    connection = connect_mysql(host, user, password, 'test_db')
+    connection = connect_mysql(host, user, password, "test_db")
 
     if connection:
         # Create database and table
         # create_database_and_table(connection)
-        
+
         # Insert random values
         # insert_random_values(connection, 12)
         # print("Inserted 12 random values into the database.\n")
@@ -117,6 +119,7 @@ def main():
         connection.close()
     else:
         print("Failed to connect to MySQL.")
+
 
 if __name__ == "__main__":
     main()

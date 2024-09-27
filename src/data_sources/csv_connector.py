@@ -4,14 +4,17 @@ import csv
 import logging
 from typing import List, Dict, Any
 
-project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.append(project_dir)
 from config import Config
 from config import Config
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
+
 
 class CSVConnector:
     def __init__(self):
@@ -24,7 +27,7 @@ class CSVConnector:
 
         try:
             for filename in os.listdir(self.csv_directory):
-                if filename.endswith('.csv'):
+                if filename.endswith(".csv"):
                     file_data = self._process_csv_file(filename)
                     if file_data:
                         all_data.append(file_data)
@@ -36,7 +39,7 @@ class CSVConnector:
     def _process_csv_file(self, filename: str) -> Dict[str, Any]:
         filepath = os.path.join(self.csv_directory, filename)
         try:
-            with open(filepath, 'r', newline='', encoding=self.encoding) as csvfile:
+            with open(filepath, "r", newline="", encoding=self.encoding) as csvfile:
                 csv_reader = csv.reader(csvfile)
                 schema = next(csv_reader, [])
                 sample_data = self._get_sample_data(csv_reader)
@@ -45,7 +48,7 @@ class CSVConnector:
                     "database": self.csv_directory,
                     "table": filename,
                     "schema": schema,
-                    "sample_data": sample_data
+                    "sample_data": sample_data,
                 }
         except IOError as e:
             self.logger.error(f"Error reading file {filepath}: {e}")
